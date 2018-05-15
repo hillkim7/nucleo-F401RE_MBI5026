@@ -113,10 +113,11 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   
-  HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_1);
-  HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_2);
-  HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_3);
+  HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_3);
   HAL_TIM_Base_Start_IT(&htim2);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -200,7 +201,7 @@ void SystemClock_Config(void)
 static uint32_t shift_index = 0;
 uint8_t bit_map[NUM_SHIFT] = { // sample SDI data pulse
   0, 0, 0,
-  1, 1, 1, 1, 0, 0, 1, 1,
+  1, 1, 1, 0, 0, 0, 1, 1,
   0, 1, 0, 1, 0, 1, 0, 1,
   0
 };
@@ -223,9 +224,12 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
         HAL_GPIO_WritePin(CLK_GPIO_Port, CLK_Pin, GPIO_PIN_RESET);
         if (++shift_index == NUM_SHIFT)
           shift_index = 0;
+
+        HAL_GPIO_WritePin(LE_GPIO_Port, LE_Pin, GPIO_PIN_RESET);
+
         break;
       case HAL_TIM_ACTIVE_CHANNEL_3:
-        HAL_GPIO_WritePin(SDI_GPIO_Port, SDI_Pin, (GPIO_PinState)(shift_index == 19));
+        HAL_GPIO_WritePin(LE_GPIO_Port, LE_Pin, (GPIO_PinState)(shift_index == 19));
         break;
       default:
         break;
