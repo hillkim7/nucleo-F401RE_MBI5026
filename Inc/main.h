@@ -67,8 +67,8 @@
 #define SDI_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
-#define LE_Pin GPIO_PIN_13
-#define LE_GPIO_Port GPIOA
+#define LE_Pin GPIO_PIN_10
+#define LE_GPIO_Port GPIOC
 
 /* ########################## Assert Selection ############################## */
 /**
