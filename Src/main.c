@@ -116,7 +116,10 @@ int main(void)
   HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_1);
   HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_2);
   HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_3);
-  HAL_TIM_Base_Start_IT(&htim2);
+  
+  // test purpose only
+  //HAL_TIM_Base_Start_IT(&htim2);
+  
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
@@ -199,11 +202,10 @@ void SystemClock_Config(void)
 #define NUM_SHIFT 20
 
 static uint32_t shift_index = 0;
-uint8_t bit_map[NUM_SHIFT] = { // sample SDI data pulse
-  0, 0, 0,
-  1, 1, 1, 0, 0, 0, 1, 1,
-  0, 1, 0, 1, 0, 1, 0, 1,
-  0
+uint8_t bit_map[NUM_SHIFT] = {
+  0, 0, 0,                                          // three OE time domain
+  1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1,   // SDI time domain
+  0                                                 // LE time domain
 };
 
 // Handle Output Compare Event
@@ -248,9 +250,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
   else if (htim->Instance == TIM2)
   {
-    int toggle = HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin);
+    //int toggle = HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin);
     
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, (GPIO_PinState)!toggle);
+    //HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, (GPIO_PinState)!toggle);
   }
 }
 
