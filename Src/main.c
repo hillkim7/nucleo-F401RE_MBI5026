@@ -86,7 +86,7 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  uint32_t tick = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -112,7 +112,11 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-
+  
+  HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_3);
+  HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -127,7 +131,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -191,6 +194,61 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+#define NUM_SHIFT 20
+
+static uint32_t shift_index = 0;
+uint8_t bit_map[NUM_SHIFT] = { // sample SDI data pulse
+  0, 0, 0,
+  1, 1, 1, 1, 0, 0, 1, 1,
+  0, 1, 0, 1, 0, 1, 0, 1,
+  0
+};
+
+// Handle Output Compare Event
+void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM1)
+  {
+    switch(htim->Channel)
+    {
+      case HAL_TIM_ACTIVE_CHANNEL_1:
+        HAL_GPIO_WritePin(SDI_GPIO_Port, SDI_Pin, (GPIO_PinState)bit_map[shift_index]);
+        // make clock up
+        HAL_GPIO_WritePin(CLK_GPIO_Port, CLK_Pin, (GPIO_PinState)(shift_index >= 3 && shift_index <= 18));
+        break;
+      case HAL_TIM_ACTIVE_CHANNEL_2:
+        HAL_GPIO_WritePin(SDI_GPIO_Port, SDI_Pin, GPIO_PIN_RESET);
+        // Make clock down
+        HAL_GPIO_WritePin(CLK_GPIO_Port, CLK_Pin, GPIO_PIN_RESET);
+        if (++shift_index == NUM_SHIFT)
+          shift_index = 0;
+        break;
+      case HAL_TIM_ACTIVE_CHANNEL_3:
+        HAL_GPIO_WritePin(SDI_GPIO_Port, SDI_Pin, (GPIO_PinState)(shift_index == 19));
+        break;
+      default:
+        break;
+    }
+  }
+  else if (htim->Instance == TIM2)
+  {
+  }
+}
+
+// Handle Update Event
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM1)
+  {
+  }
+  else if (htim->Instance == TIM2)
+  {
+    int toggle = HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin);
+    
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, (GPIO_PinState)!toggle);
+  }
+}
 
 /* USER CODE END 4 */
 
