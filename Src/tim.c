@@ -66,7 +66,7 @@ void MX_TIM1_Init(void)
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig;
 
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 1600-1;
+  htim1.Init.Prescaler = 1600/2-1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim1.Init.Period = 10-1;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -144,7 +144,7 @@ void MX_TIM2_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 1600-1;
+  htim2.Init.Prescaler = 1600/2-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 300;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
